@@ -28,7 +28,7 @@ prompt APPLICATION 89230 - PLUGIN
 -- Application Export:
 --   Application:     89230
 --   Name:            PLUGIN
---   Date and Time:   12:16 Monday November 6, 2023
+--   Date and Time:   13:42 Monday November 6, 2023
 --   Exported By:     DMAKOVAC
 --   Flashback:       0
 --   Export Type:     Component Export
@@ -683,26 +683,43 @@ wwv_flow_api.create_plugin_attribute(
 '<p>You can also use the #SQLCODE#, #SQLERRM# and #SQLERRM_TEXT# substitution strings for more detailed error information.</p>'))
 );
 wwv_flow_api.create_plugin_attribute(
- p_id=>wwv_flow_api.id(305078777067165790)
+ p_id=>wwv_flow_api.id(305158645918788930)
 ,p_plugin_id=>wwv_flow_api.id(354827174200168328)
 ,p_attribute_scope=>'COMPONENT'
 ,p_attribute_sequence=>12
 ,p_display_sequence=>160
 ,p_prompt=>'Auto dismiss after'
-,p_attribute_type=>'INTEGER'
-,p_is_required=>false
-,p_default_value=>'0'
-,p_unit=>'seconds'
+,p_attribute_type=>'SELECT LIST'
+,p_is_required=>true
+,p_default_value=>'5'
 ,p_is_translatable=>false
+,p_lov_type=>'STATIC'
 ,p_help_text=>wwv_flow_string.join(wwv_flow_t_varchar2(
 'Number of seconds after which the notification should be automatically removed. Hovering or clicking the notification stops this event.',
 '<br>',
-'<ul>',
-'  <li>If zero the notification does not auto dismiss.</li>',
-'  <li>If empty the notification does not auto dismiss.</li>',
-'</ul>',
-'<br>',
-'Default: <b>0</b>'))
+'Default: <b>5</b>'))
+);
+wwv_flow_api.create_plugin_attr_value(
+ p_id=>wwv_flow_api.id(305160565975789531)
+,p_plugin_attribute_id=>wwv_flow_api.id(305158645918788930)
+,p_display_sequence=>10
+,p_display_value=>'5 seconds'
+,p_return_value=>'5'
+);
+wwv_flow_api.create_plugin_attr_value(
+ p_id=>wwv_flow_api.id(305162402209790386)
+,p_plugin_attribute_id=>wwv_flow_api.id(305158645918788930)
+,p_display_sequence=>20
+,p_display_value=>'10 seconds'
+,p_return_value=>'10'
+);
+wwv_flow_api.create_plugin_attr_value(
+ p_id=>wwv_flow_api.id(305164382148792056)
+,p_plugin_attribute_id=>wwv_flow_api.id(305158645918788930)
+,p_display_sequence=>30
+,p_display_value=>'No'
+,p_return_value=>'0'
+,p_help_text=>'Disable'
 );
 wwv_flow_api.create_plugin_attribute(
  p_id=>wwv_flow_api.id(338323779805355414)
