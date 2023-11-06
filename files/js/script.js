@@ -18,29 +18,35 @@ FOS.interactiveGrid = FOS.interactiveGrid || {};
  * @param {function} [initFn]                       Javascript initialization function which allows you to override any settings right before the dynamic action is invoken
  */
 FOS.interactiveGrid.processRows = function (daContext, config, initFn) {
+    
+    // constants
+    var C_DANGER = 'danger';
+    var C_ERROR = 'error';
+    var C_INFO = 'info';
+    var C_SUCCESS = 'success';
+    var C_WARNING = 'warning';
 
     var pluginName = 'FOS - Interactive Grid - Process Rows';
-    var fostrOptions = {};
+    
     apex.debug.info(pluginName, config);
-
-    console.log('config', config);
-
-    fostrOptions = {
-        dismiss: ['onClick', 'onButton'],
-        dismissAfter: null,
-        newestOnTop: true,
-        preventDuplicates: true,
-        escapeHtml: false,
-        position: 'top-right',
-        iconClass: null,
-        clearAll: false
-    };
 
     // Allow the developer to perform any last (centralized) changes using Javascript Initialization Code
     if (initFn instanceof Function) {
         fostr = fostr || {};
         initFn.call(daContext, config, fostrOptions);
     }
+
+    var fostrOptions = {};
+    fostrOptions = {
+        dismiss: ['onClick', 'onButton'],
+        dismissAfter: config.dismissAfter,
+        newestOnTop: true,
+        preventDuplicates: false,
+        escapeHtml: false,
+        position: 'top-right',
+        iconClass: null,
+        clearAll: false
+    };
 
     var regionId = daContext.action.affectedRegionId;
     var ajaxId = config.ajaxId;
@@ -67,7 +73,16 @@ FOS.interactiveGrid.processRows = function (daContext, config, initFn) {
         // if no rows are selected, there's no need to contact the server
         if (selectedRecords.length == 0) {
             apex.debug.info('No selected records. Continuing without server call.');
-
+            
+            if (apex.lang.hasMessage('APEX.GV.SELECTION_COUNT')) {
+                $.extend(fostrOptions, {
+                    message: apex.lang.formatMessage('APEX.GV.SELECTION_COUNT', 0),
+                    title: undefined,
+                    type: C_WARNING
+                });
+                fostr[C_WARNING](fostrOptions);
+            }
+            
             var errorOccurred = false;
             apex.da.resume(daContext.resumeCallback, errorOccurred);
             return;
@@ -94,8 +109,8 @@ FOS.interactiveGrid.processRows = function (daContext, config, initFn) {
 
         var message = data.message;
         var messageTitle = data.messageTitle;
-        var messageType = (data.messageType && ['info', 'warning', 'success', 'error', 'danger'].includes(data.messageType)) ? data.messageType : 'success';
-        messageType = (messageType === 'danger') ? 'error' : messageType;
+        var messageType = (data.messageType && [C_INFO, C_WARNING, C_SUCCESS, C_ERROR, C_DANGER].includes(data.messageType)) ? data.messageType : 'success';
+        messageType = (messageType === C_DANGER) ? C_ERROR : messageType;
 
         // check if the developer wants to cancel following actions
         cancelActions = !!data.cancelActions; // ensure we have a boolean response if attribute is undefined
@@ -120,7 +135,7 @@ FOS.interactiveGrid.processRows = function (daContext, config, initFn) {
             message = apex.util.escapeHTML(message);
         }
 
-        if (data.status == 'success') {
+        if (data.status == C_SUCCESS) {
 
             // set any items to return
             if (data.itemsToReturn) {
@@ -155,8 +170,8 @@ FOS.interactiveGrid.processRows = function (daContext, config, initFn) {
             // show notification message
             if (message) {
                 $.extend(fostrOptions, {
-                    message: (messageTitle) ? message : undefined,
-                    title: (!messageTitle) ? message : messageTitle,
+                    message: message,
+                    title: messageTitle,
                     type: messageType
                 });
                 fostr[messageType](fostrOptions);
@@ -167,9 +182,9 @@ FOS.interactiveGrid.processRows = function (daContext, config, initFn) {
 
             if (message) {
                 $.extend(fostrOptions, {
-                    message: (messageTitle) ? message : undefined,
-                    title: (!messageTitle) ? message : messageTitle,
-                    type: 'error'
+                    message: message,
+                    title: messageTitle,
+                    type: C_ERROR
                 });
                 fostr.error(fostrOptions);
             }
